@@ -538,6 +538,72 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Function to handle sharing an activity
+  function handleShare(activityName, details, shareType, button) {
+    // Create share URL and message
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${baseUrl}?activity=${encodeURIComponent(activityName)}`;
+    const shareTitle = `Join ${activityName} at Mergington High School!`;
+    const shareText = `Check out this activity: ${activityName} - ${details.description}`;
+
+    switch (shareType) {
+      case "facebook":
+        // Facebook share dialog
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          shareUrl
+        )}`;
+        window.open(facebookUrl, "_blank", "width=600,height=400");
+        break;
+
+      case "twitter":
+        // Twitter share dialog
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          shareText
+        )}&url=${encodeURIComponent(shareUrl)}`;
+        window.open(twitterUrl, "_blank", "width=600,height=400");
+        break;
+
+      case "email":
+        // Email share using mailto
+        const emailSubject = encodeURIComponent(shareTitle);
+        const emailBody = encodeURIComponent(
+          `${shareText}\n\nSchedule: ${formatSchedule(details)}\n\nLearn more: ${shareUrl}`
+        );
+        window.location.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+        break;
+
+      case "copy":
+        // Copy link to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(shareUrl)
+            .then(() => {
+              // Visual feedback
+              const originalIcon = button.querySelector(".share-icon").textContent;
+              button.classList.add("copied");
+              button.querySelector(".share-icon").textContent = "✓";
+              button.title = "Link copied!";
+
+              setTimeout(() => {
+                button.classList.remove("copied");
+                button.querySelector(".share-icon").textContent = originalIcon;
+                button.title = "Copy link";
+              }, 2000);
+
+              showMessage("Link copied to clipboard!", "success");
+            })
+            .catch((err) => {
+              console.error("Failed to copy:", err);
+              showMessage("Failed to copy link", "error");
+            });
+        } else {
+          // Fallback for older browsers
+          showMessage("Copy to clipboard not supported in this browser", "error");
+        }
+        break;
+    }
+  }
+
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
@@ -655,6 +721,21 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button class="share-button facebook" data-activity="${name}" data-share-type="facebook" title="Share on Facebook">
+          <span class="share-icon">📘</span>
+        </button>
+        <button class="share-button twitter" data-activity="${name}" data-share-type="twitter" title="Share on Twitter">
+          <span class="share-icon">🐦</span>
+        </button>
+        <button class="share-button email" data-activity="${name}" data-share-type="email" title="Share via Email">
+          <span class="share-icon">✉️</span>
+        </button>
+        <button class="share-button copy-link" data-activity="${name}" data-share-type="copy" title="Copy link">
+          <span class="share-icon">🔗</span>
+        </button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -672,6 +753,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const shareType = button.dataset.shareType;
+        handleShare(name, details, shareType, button);
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
