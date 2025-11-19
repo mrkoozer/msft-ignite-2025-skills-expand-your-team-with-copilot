@@ -205,6 +205,20 @@ section h3 {
   letter-spacing: 0.3px;
 }
 
+.difficulty-tag {
+  position: absolute;
+  top: 8px;
+  right: 85px;
+  background: #f0f0f0;
+  color: #666;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
 /* Capacity Indicator */
 .capacity-container {
   margin: 8px 0;
