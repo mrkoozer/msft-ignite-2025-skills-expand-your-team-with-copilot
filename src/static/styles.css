@@ -32,6 +32,40 @@
   --info-light: #d1ecf1;
 }
 
+/* Dark mode color palette */
+body.dark-mode {
+  /* Primary colors - adjusted for dark mode */
+  --primary: #534bae;
+  --primary-light: #7c73c0;
+  --primary-dark: #3f3687;
+  --primary-text: #ffffff;
+
+  /* Secondary colors - same as light mode */
+  --secondary: #ff6f00;
+  --secondary-light: #ffa040;
+  --secondary-dark: #c43e00;
+  --secondary-text: #ffffff;
+
+  /* Neutral colors - dark theme */
+  --background: #1a1a1a;
+  --surface: #2d2d2d;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --border: #404040;
+  --border-light: #353535;
+  --border-focus: #505050;
+
+  /* Feedback colors - adjusted for dark backgrounds */
+  --success: #4caf50;
+  --success-light: #2d4a2e;
+  --warning: #ff9800;
+  --warning-light: #4a3a20;
+  --error: #f44336;
+  --error-light: #4a2e2c;
+  --info: #2196f3;
+  --info-light: #2d3e4a;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -48,6 +82,14 @@ body {
   padding: 12px;
   background-color: var(--background);
   font-size: 0.9rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth transitions for elements when switching themes */
+body *,
+body *::before,
+body *::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 header {
@@ -617,6 +659,34 @@ footer {
   position: absolute;
   top: 10px;
   right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Dark mode toggle button */
+#dark-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+#dark-mode-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+#dark-mode-toggle:active {
+  transform: scale(0.95);
 }
 
 #user-status {
