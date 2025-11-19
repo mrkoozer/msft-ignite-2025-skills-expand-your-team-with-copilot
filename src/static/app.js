@@ -569,6 +569,20 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="social-share-buttons">
+        <button class="share-button share-twitter" data-activity="${name}" title="Share on Twitter">
+          <span class="share-icon">🐦</span>
+        </button>
+        <button class="share-button share-facebook" data-activity="${name}" title="Share on Facebook">
+          <span class="share-icon">📘</span>
+        </button>
+        <button class="share-button share-email" data-activity="${name}" title="Share via Email">
+          <span class="share-icon">✉️</span>
+        </button>
+        <button class="share-button share-copy" data-activity="${name}" title="Copy Link">
+          <span class="share-icon">🔗</span>
+        </button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +600,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handlers for social share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        handleShare(event, name, details);
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -809,6 +831,76 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       messageDiv.classList.add("hidden");
     }, 5000);
+  }
+
+  // Handle social sharing
+  function handleShare(event, activityName, details) {
+    event.preventDefault();
+    const button = event.currentTarget;
+    const shareType = button.classList.contains("share-twitter")
+      ? "twitter"
+      : button.classList.contains("share-facebook")
+      ? "facebook"
+      : button.classList.contains("share-email")
+      ? "email"
+      : "copy";
+
+    // Create shareable content
+    const activityUrl = `${window.location.origin}${window.location.pathname}`;
+    const formattedSchedule = formatSchedule(details);
+    const shareText = `Check out ${activityName} at Mergington High School! ${details.description} Schedule: ${formattedSchedule}`;
+    const shareUrl = `${activityUrl}#${encodeURIComponent(activityName)}`;
+
+    switch (shareType) {
+      case "twitter":
+        // Twitter share - limited to 280 characters
+        const twitterText = shareText.length > 250 ? shareText.substring(0, 247) + "..." : shareText;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          twitterText
+        )}&url=${encodeURIComponent(shareUrl)}`;
+        window.open(twitterUrl, "_blank", "width=550,height=420");
+        showMessage("Opening Twitter to share activity...", "info");
+        break;
+
+      case "facebook":
+        // Facebook share
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          shareUrl
+        )}&quote=${encodeURIComponent(shareText)}`;
+        window.open(facebookUrl, "_blank", "width=550,height=420");
+        showMessage("Opening Facebook to share activity...", "info");
+        break;
+
+      case "email":
+        // Email share
+        const emailSubject = `Join ${activityName} at Mergington High School`;
+        const emailBody = `${shareText}\n\nLearn more: ${shareUrl}`;
+        const emailUrl = `mailto:?subject=${encodeURIComponent(
+          emailSubject
+        )}&body=${encodeURIComponent(emailBody)}`;
+        window.location.href = emailUrl;
+        showMessage("Opening email client...", "info");
+        break;
+
+      case "copy":
+        // Copy link to clipboard
+        const copyText = `${activityName}\n${shareText}\n\n${shareUrl}`;
+        navigator.clipboard
+          .writeText(copyText)
+          .then(() => {
+            showMessage("Activity link copied to clipboard!", "success");
+            // Add visual feedback to the button
+            button.classList.add("copied");
+            setTimeout(() => {
+              button.classList.remove("copied");
+            }, 2000);
+          })
+          .catch((err) => {
+            console.error("Failed to copy:", err);
+            showMessage("Failed to copy link. Please try again.", "error");
+          });
+        break;
+    }
   }
 
   // Handle form submission
